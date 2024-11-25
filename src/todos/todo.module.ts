@@ -11,6 +11,7 @@ import { BlacklistedToken, BlacklistedTokenSchema } from '../auth/schemas/blackl
   imports: [
     MongooseModule.forFeature([
       { name: Todo.name, schema: TodoSchema },
+      
       { name: BlacklistedToken.name, schema: BlacklistedTokenSchema },
     ]),
     AuthModule, 

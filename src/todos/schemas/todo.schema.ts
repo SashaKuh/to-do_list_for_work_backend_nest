@@ -3,7 +3,7 @@ import { Types } from 'mongoose';
 
 export enum TodoDifficulty {
   EASY = 'Easy',
-  MEDIUM = 'Medium', 
+  MEDIUM = 'Medium',
   HARD = 'Hard'
 }
 
@@ -27,21 +27,27 @@ export class Todo {
   status: TodoStatus;
 
   @Prop({
-    type: {
+    type: [{
       _id: { type: Types.ObjectId, ref: 'User', required: true },
       name: { type: String, required: true },
       email: { type: String, required: true },
-    },
+    }],
     required: true,
   })
-  owner: {
+  owners: Array<{
     _id: Types.ObjectId;
     name: string;
     email: string;
-  };
+  }>;
 
   @Prop({ default: Date.now })
   createdAt: Date;
+
+  @Prop({ type: String, required: false })
+  comment?: string;
+
+  @Prop({ type: Date, required: false })
+  deadline?: Date;
 }
 
 export const TodoSchema = SchemaFactory.createForClass(Todo);

@@ -1,4 +1,4 @@
-import { Controller, Post, Body, UseGuards, Request, HttpStatus } from '@nestjs/common';
+import { Controller, Post, Body, UseGuards, Request, HttpStatus, UnauthorizedException } from '@nestjs/common';
 import { AuthService } from '../services/auth.service';
 import { RegisterDto } from '../dto/register-user.dto';
 import { LoginDto } from '../dto/login-user.dto';
@@ -27,13 +27,18 @@ export class AuthController {
     };
   }
 
-  @UseGuards(AuthGuard)
-  @Post('logout')
-  async logout(@Request() req) {
-    await this.authService.logout(req.user.accessToken);
-    return {
-      status: HttpStatus.OK,
-      message: 'Successfully logged out',
-    };
+@UseGuards(AuthGuard)
+@Post('logout')
+async logout(@Request() req) {
+  const token = req.headers.authorization?.split(' ')[1]; 
+  if (!token) {
+    throw new UnauthorizedException('No token provided');
   }
+  await this.authService.logout(token);
+  return {
+    status: HttpStatus.OK,
+    message: 'Successfully logged out',
+  };
+}
+
 }

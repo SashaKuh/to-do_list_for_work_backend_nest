@@ -1,4 +1,4 @@
-import { IsEnum, IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { IsEnum, IsNotEmpty, IsOptional, IsString, IsDate } from 'class-validator';
 import { TodoDifficulty, TodoStatus } from '../schemas/todo.schema';
 
 // DTO: Передача даних з контролера до сервісу
@@ -16,4 +16,12 @@ export class CreateTodoDto {
 
   @IsEnum(TodoStatus)
   status: TodoStatus;
+
+  @IsString()
+  @IsOptional()
+  comment?: string; 
+
+  @IsDate()
+  @IsOptional()
+  deadline?: Date; 
 }
