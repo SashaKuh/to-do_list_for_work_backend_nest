@@ -1,17 +1,19 @@
-import { IsString, IsEnum, IsOptional, MinLength, MaxLength } from 'class-validator';
-import { TodoDifficulty } from '../schemas/todo.schema';
+import { IsEnum, IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { TodoDifficulty, TodoStatus } from '../schemas/todo.schema';
 
+// DTO: Передача даних з контролера до сервісу
 export class CreateTodoDto {
   @IsString()
-  @MinLength(3)
-  @MaxLength(50)
+  @IsNotEmpty()
   title: string;
 
   @IsString()
   @IsOptional()
-  @MaxLength(200)
   description?: string;
 
   @IsEnum(TodoDifficulty)
   difficulty: TodoDifficulty;
+
+  @IsEnum(TodoStatus)
+  status: TodoStatus;
 }

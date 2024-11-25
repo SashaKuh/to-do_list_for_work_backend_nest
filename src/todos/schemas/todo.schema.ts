@@ -1,9 +1,9 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document, Types } from 'mongoose';
+import { Types } from 'mongoose';
 
 export enum TodoDifficulty {
   EASY = 'Easy',
-  MEDIUM = 'Medium',
+  MEDIUM = 'Medium', 
   HARD = 'Hard'
 }
 
@@ -12,53 +12,36 @@ export enum TodoStatus {
   DONE = 'done'
 }
 
-@Schema({
-  collection: 'todo',
-  timestamps: true,
-  versionKey: false,
-})
+@Schema({ timestamps: true, versionKey: false, collection: 'todo' })
 export class Todo {
-  @Prop({
-    type: String,
-    required: true,
-    minlength: 3,
-    maxlength: 50
-  })
+  @Prop({ required: true })
   title: string;
 
-  @Prop({
-    type: String,
-    default: '',
-    maxlength: 200
-  })
+  @Prop()
   description?: string;
 
-  @Prop({
-    type: String,
-    enum: TodoDifficulty,
-    required: true
-  })
+  @Prop({ required: true, enum: TodoDifficulty })
   difficulty: TodoDifficulty;
 
-  @Prop({
-    type: String,
-    enum: TodoStatus,
-    default: TodoStatus.IN_PROGRESS
-  })
+  @Prop({ required: true, enum: TodoStatus })
   status: TodoStatus;
 
-  @Prop({ type: Types.ObjectId, ref: 'User', required: true })
-  owner: Types.ObjectId;
+  @Prop({
+    type: {
+      _id: { type: Types.ObjectId, ref: 'User', required: true },
+      name: { type: String, required: true },
+      email: { type: String, required: true },
+    },
+    required: true,
+  })
+  owner: {
+    _id: Types.ObjectId;
+    name: string;
+    email: string;
+  };
 
-  @Prop({ type: String, required: true })
-  ownerEmail: string;
-
-  @Prop({ type: String, required: true })
-  ownerName: string;
-
-  @Prop({ type: Types.ObjectId, ref: 'User', default: null })
-  assignedTo: Types.ObjectId | null;
+  @Prop({ default: Date.now })
+  createdAt: Date;
 }
 
-export type TodoDocument = Todo & Document;
 export const TodoSchema = SchemaFactory.createForClass(Todo);

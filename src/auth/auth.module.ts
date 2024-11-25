@@ -7,10 +7,11 @@ import { AuthService } from './services/auth.service';
 import { User, UserSchema } from './schemas/auth.schema';
 import { BlacklistedToken, BlacklistedTokenSchema } from './schemas/blacklisted-token.schema';
 import { JwtStrategy } from './strategies/jwt.strategy';
+import { AuthGuard } from './guards/jwt-auth.guard';
 
 @Module({
   imports: [
-    ConfigModule.forRoot(), // Додаємо ConfigModule.forRoot()
+    ConfigModule.forRoot(),
     MongooseModule.forFeature([
       { name: User.name, schema: UserSchema },
       { name: BlacklistedToken.name, schema: BlacklistedTokenSchema },
@@ -18,13 +19,14 @@ import { JwtStrategy } from './strategies/jwt.strategy';
     JwtModule.registerAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({
-        secret: configService.get('JWT_SECRET'),
+        secret: configService.get('JWT_ACCESS_SECRET'),
         signOptions: { expiresIn: '1d' },
       }),
       inject: [ConfigService],
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService, JwtStrategy],
+  providers: [AuthService, JwtStrategy, AuthGuard],
+  exports: [AuthGuard, JwtModule, ConfigModule],
 })
 export class AuthModule {}
