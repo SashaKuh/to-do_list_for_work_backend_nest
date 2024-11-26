@@ -1,4 +1,5 @@
-import { IsString, IsEmail, MinLength, MaxLength } from 'class-validator';
+import { IsString, IsEmail, MinLength, MaxLength, IsOptional, IsEnum } from 'class-validator';
+import { UserRole } from '../schemas/auth.schema'; // Імпортуємо enum ролей
 
 export class RegisterDto {
   @IsString()
@@ -11,4 +12,8 @@ export class RegisterDto {
 
   @IsString()
   password: string;
+
+  @IsOptional()
+  @IsEnum(UserRole)
+  role?: UserRole; 
 }

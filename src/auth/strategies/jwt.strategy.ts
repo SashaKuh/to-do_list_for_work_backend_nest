@@ -28,6 +28,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       throw new UnauthorizedException('Token has been invalidated');
     }
 
-    return { ...payload, accessToken: token };
+    console.log(payload);
+    return { ...payload, accessToken: token, role: payload.role };
   }
 }

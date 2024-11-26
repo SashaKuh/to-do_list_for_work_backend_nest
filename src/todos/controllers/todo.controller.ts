@@ -19,6 +19,8 @@ import { AuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { RequestWithUser } from '../interfaces/request-with-user.interface';
 import { UpdateTodoDto } from '../dto/update-todo.dto';
 import { AssignTodoDto } from '../dto/assign-todo.dto';
+import { Roles } from 'src/auth/util/roles.decorator';
+import { UserRole } from 'src/auth/schemas/auth.schema';
 
 
 // Repository Pattern (Інкапсуляція доступу до бази даних у спеціальному класі)
@@ -28,17 +30,20 @@ export class TodoController {
   constructor(private readonly todoService: TodoService) {} // DIP: Сервіс передається через інверсію залежностей
 
   @Get()
-  async getAllTasks(@Req() req: RequestWithUser): Promise<Todo[]> {
+  @Roles(UserRole.USER, UserRole.ADMIN)
+  async getAllTasks(
+    @Req() req: RequestWithUser,
+  ): Promise<Todo[]> {
     const ownerId = req.user.id;
-    console.log('ownerId', ownerId);
-    return this.todoService.getAllTasks(ownerId); // SRP: Контролер делегує логіку сервісу
+    const role = req.user.role;
+    return this.todoService.getAllTasks(ownerId, role); // SRP: Контролер делегує логіку сервісу
   }
 
   @Get(':taskId')
   async getTaskById(@Param('taskId') taskId: string, @Req() req: RequestWithUser): Promise<Todo> {
     const ownerId = req.user.id;
-    console.log(taskId, ownerId);
-    return this.todoService.getTaskById(taskId, ownerId);  // SRP: Виклик бізнес-логіки з сервісу
+    const role = req.user.role;
+    return this.todoService.getTaskById(taskId, ownerId, role);  // SRP: Виклик бізнес-логіки з сервісу
   }
 
   @Post()
@@ -58,7 +63,8 @@ export class TodoController {
     @Req() req: RequestWithUser
   ): Promise<Todo> {
     const ownerId = req.user.id;
-    return this.todoService.updateTask(taskId, ownerId, todoData);
+    const role = req.user.role;
+    return this.todoService.updateTask(taskId, ownerId, todoData, role);
   }
 
   @Put(':taskId/assign')
@@ -68,13 +74,15 @@ export class TodoController {
     @Req() req: RequestWithUser
   ): Promise<Todo> {
     const ownerId = req.user.id;
-    return this.todoService.assignTask(taskId, ownerId, assignDto);
+    const role = req.user.role;
+    return this.todoService.assignTask(taskId, ownerId, assignDto, role);
   }
 
   @Delete(':taskId')
   @HttpCode(HttpStatus.NO_CONTENT)
   async deleteTask(@Param('taskId') taskId: string, @Req() req: RequestWithUser): Promise<void> {
     const ownerId = req.user.id;
-    await this.todoService.deleteTask(taskId, ownerId);
+    const role = req.user.role;
+    await this.todoService.deleteTask(taskId, ownerId, role);
   }
 }

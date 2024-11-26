@@ -1,5 +1,11 @@
+// auth.schema.ts
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
+
+export enum UserRole {
+  USER = 'user',
+  ADMIN = 'admin'
+}
 
 export type UserDocument = User & Document;
 
@@ -25,6 +31,13 @@ export class User {
 
   @Prop({ default: null })
   passwordResetExpires: Date;
+
+  @Prop({ 
+    type: String, 
+    enum: UserRole, 
+    default: UserRole.USER 
+  })
+  role: UserRole;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

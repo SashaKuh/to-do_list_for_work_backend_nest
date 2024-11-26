@@ -3,7 +3,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
-import { User, UserDocument } from '../schemas/auth.schema';
+import { User, UserDocument, UserRole } from '../schemas/auth.schema';
 import { BlacklistedToken, BlacklistedTokenDocument } from '../schemas/blacklisted-token.schema';
 import { RegisterDto } from '../dto/register-user.dto';
 import { LoginDto } from '../dto/login-user.dto';
@@ -30,6 +30,7 @@ export class AuthService {
     const user = await this.userModel.create({
       ...registerDto,
       password: hashedPassword,
+      role: registerDto.role || UserRole.USER,
     });
 
     const tokens = await this.generateTokens(user);
@@ -41,9 +42,11 @@ export class AuthService {
         id: user._id,
         name: user.name,
         email: user.email,
+        role: user.role,
       },
       ...tokens,
-    };
+    }
+    
   }
 
   async login(loginDto: LoginDto) {
@@ -65,6 +68,7 @@ export class AuthService {
         id: user._id,
         name: user.name,
         email: user.email,
+        role: user.role,
       },
       ...tokens,
     };
@@ -90,7 +94,8 @@ export class AuthService {
     const payload = { 
       id: user._id,
       email: user.email,
-      name: user.name
+      name: user.name,
+      role: user.role 
     };
     
     const [accessToken, refreshToken] = await Promise.all([
